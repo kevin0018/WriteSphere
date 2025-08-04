@@ -1,12 +1,24 @@
-import { Component, signal } from '@angular/core';
+import { Component } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
 
 @Component({
   selector: 'app-root',
   imports: [RouterOutlet],
-  templateUrl: './app.html',
-  styleUrl: './app.css'
+  template: `
+    <div class="min-h-screen bg-gray-50">
+      <header class="bg-white shadow">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div class="flex justify-between h-16">
+            <div class="flex items-center">
+              <h1 class="text-xl font-semibold text-gray-900">WriteSphere</h1>
+            </div>
+          </div>
+        </div>
+      </header>
+      <main>
+        <router-outlet />
+      </main>
+    </div>
+  `
 })
-export class App {
-  protected readonly title = signal('frontend');
-}
+export class App {}
