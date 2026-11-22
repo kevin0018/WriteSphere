@@ -21,7 +21,7 @@ La primera entrega termina cuando dos cuentas pueden completar esos recorridos c
 ## Stack propuesto
 
 - Angular 22.x, CLI y SSR alineados. Node 26.x, TypeScript 6.0.x y npm con lockfile. Consultar la versión estable publicada y respetar los rangos de compatibilidad en el momento de instalar. [Matriz oficial](https://angular.dev/reference/versions)
-- Decisión de frontend pendiente. Kevin ha identificado shadcn/ui como la biblioteca de referencia. Para usar sus componentes originales con SSR se propone React con Next.js y Tailwind. La alternativa para conservar Angular es Tailwind CSS con spartan/ui. Las versiones de Angular y el uso de Brain y Helm corresponden a esta segunda opción. [Instalación de shadcn/ui](https://ui.shadcn.com/docs/installation)
+- Decisión de frontend pendiente. shadcn/ui es la biblioteca de referencia. Para usar sus componentes originales con SSR se propone React con Next.js y Tailwind. La alternativa para conservar Angular es Tailwind CSS con spartan/ui. Las versiones de Angular y el uso de Brain y Helm corresponden a esta segunda opción. [Instalación de shadcn/ui](https://ui.shadcn.com/docs/installation)
 - Para la opción Angular con spartan/ui: Usar Brain para interacción y foco, e incorporar solo las piezas Helm necesarias. Empezar por el diálogo de retirada de una obra. Verificar sus dependencias declaradas, navegación por teclado e hidratación SSR antes de extender la biblioteca. [Instalación oficial](https://spartan.ng/documentation/installation)
 - Spring Boot 4.2.0 como referencia estable consultada, Java 25 LTS y Maven Wrapper. Spring MVC, Security con sesión por cookie, CSRF y despliegue bajo el mismo origen. PostgreSQL con Flyway y Spring Data JPA. Resolver parches estables compatibles y fijarlos en el primer hito. [Spring Boot](https://docs.spring.io/spring-boot/) · [Requisitos](https://docs.spring.io/spring-boot/system-requirements.html)
 - Estética editorial. Texto de lectura en serif, controles en sans serif, columna de lectura estrecha y vista previa con el mismo componente que la obra publicada. Probar con poemas de versos largos, estrofas de un verso y microrrelatos de varios párrafos.
@@ -43,11 +43,11 @@ Ambos caminos usan las mismas tablas y se ejecutan de forma síncrona. Tras conf
 
 El frontend se organiza en lectura pública, sesión, editor, estantería y moderación. SSR para portada, perfil y obra publicada. Las vistas privadas y el editor se cargan en cliente. La API comprueba permisos en cada operación y devuelve 404 a terceros por obras privadas o retiradas.
 
-## Entrega para GPT-6.2 Sol
+## Plan de implementación
 
 1. Actualizar herramientas y dependencias, registrar versiones exactas, verificar que el test de cabecera corresponde a la interfaz elegida y actualizar el README con instrucciones comprobadas. Preparar PostgreSQL local reproducible y migración inicial. Verificar instalación limpia, build SSR y arranque del backend.
 2. Entregar registro, sesión, borrador y publicación de extremo a extremo. Probar persistencia tras reinicio, recuperación de errores de guardado y edición concurrente.
 3. Completar portada, filtro, perfil, lectura y estantería. Comprobar HTML público con JavaScript desactivado y privacidad con dos cuentas.
 4. Entregar moderación y retirada. Ejecutar pruebas de dominio, integración sobre PostgreSQL y un recorrido de navegador desde escritura hasta lectura y guardado. Verificar teclado y móvil, documentar el arranque y los comandos de pruebas.
 
-Confirmar con Kevin la opción de frontend antes de instalar dependencias de interfaz. Si se elige Next.js, sustituir la línea Angular por las versiones estables compatibles de React, Next.js, Node y TypeScript en el primer hito. Usar commits locales por recorrido verificado y seguir las instrucciones del repositorio para publicar cambios.
+Acordar en equipo la opción de frontend antes de instalar dependencias de interfaz. Si se elige Next.js, sustituir la línea Angular por las versiones estables compatibles de React, Next.js, Node y TypeScript en el primer hito. Usar commits locales por recorrido verificado y seguir las instrucciones del repositorio para publicar cambios.
