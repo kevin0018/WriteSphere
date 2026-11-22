@@ -5,24 +5,41 @@ import {
   writeResponseToNodeResponse,
 } from '@angular/ssr/node';
 import express from 'express';
+import { request as httpRequest } from 'node:http';
+import { request as httpsRequest } from 'node:https';
 import { join } from 'node:path';
 
 const browserDistFolder = join(import.meta.dirname, '../browser');
 
 const app = express();
-const angularApp = new AngularNodeAppEngine();
+const angularApp = new AngularNodeAppEngine({ allowedHosts: ['localhost', '127.0.0.1'] });
 
-/**
- * Example Express Rest API endpoints can be defined here.
- * Uncomment and define endpoints as necessary.
- *
- * Example:
- * ```ts
- * app.get('/api/{*splat}', (req, res) => {
- *   // Handle API request
- * });
- * ```
- */
+const apiOrigin = new URL(process.env['WRITESPHERE_API_ORIGIN'] ?? 'http://127.0.0.1:8080');
+const requestApi = apiOrigin.protocol === 'https:' ? httpsRequest : httpRequest;
+
+app.use('/api', (req, res) => {
+  const upstream = requestApi(apiOrigin, {
+    path: req.originalUrl,
+    method: req.method,
+    headers: { ...req.headers, host: apiOrigin.host },
+  }, (response) => {
+    res.writeHead(response.statusCode ?? 502, response.headers);
+    response.on('error', (error) => res.destroy(error));
+    response.pipe(res);
+  });
+  upstream.setTimeout(15_000, () => upstream.destroy(new Error('API timeout')));
+  upstream.on('error', (error) => {
+    if (res.headersSent) {
+      res.destroy(error);
+    } else {
+      res.status(502).json({ code: 'api_unavailable' });
+    }
+  });
+  res.on('close', () => {
+    if (!res.writableEnded) upstream.destroy();
+  });
+  req.pipe(upstream);
+});
 
 /**
  * Serve static files from /browser

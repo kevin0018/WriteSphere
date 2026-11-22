@@ -20,7 +20,7 @@ La primera entrega termina cuando dos cuentas pueden completar esos recorridos c
 
 ## Stack propuesto
 
-- Angular 22.x, CLI y SSR alineados. Node 26.x, TypeScript 6.0.x y npm con lockfile. Consultar la versión estable publicada y respetar los rangos de compatibilidad en el momento de instalar. [Matriz oficial](https://angular.dev/reference/versions)
+- Angular 22.x, CLI y SSR alineados. Node 26.x, TypeScript 6.0.x y pnpm con lockfile. Consultar la versión estable publicada y respetar los rangos de compatibilidad en el momento de instalar. [Matriz oficial](https://angular.dev/reference/versions)
 - Tailwind CSS y spartan/ui, una biblioteca para Angular inspirada en shadcn/ui. Usar Brain para interacción y foco, e incorporar solo las piezas Helm necesarias. Empezar por el diálogo de retirada de una obra. Verificar sus dependencias declaradas, navegación por teclado e hidratación SSR antes de extender la biblioteca. [Instalación oficial](https://spartan.ng/documentation/installation)
 - Spring Boot 4.2.0 como referencia estable consultada, Java 25 LTS y Maven Wrapper. Spring MVC, Security con sesión por cookie, CSRF y despliegue bajo el mismo origen. PostgreSQL con Flyway y Spring Data JPA. Resolver parches estables compatibles y fijarlos en el primer hito. [Spring Boot](https://docs.spring.io/spring-boot/) · [Requisitos](https://docs.spring.io/spring-boot/system-requirements.html)
 - Estética editorial. Texto de lectura en serif, controles en sans serif, columna de lectura estrecha y vista previa con el mismo componente que la obra publicada. Probar con poemas de versos largos, estrofas de un verso y microrrelatos de varios párrafos.

@@ -1,0 +1,37 @@
+services:
+  db:
+    image: postgres:18.7
+    environment:
+      POSTGRES_DB: writesphere
+      POSTGRES_USER: writesphere
+      POSTGRES_PASSWORD: writesphere
+    ports:
+      - "127.0.0.1:5432:5432"
+    volumes:
+      - postgres:/var/lib/postgresql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U writesphere -d writesphere"]
+      interval: 2s
+      timeout: 3s
+      retries: 15
+
+  api:
+    build: ./backend
+    environment:
+      WRITESPHERE_BIND_ADDRESS: 0.0.0.0
+      WRITESPHERE_DB_URL: jdbc:postgresql://db:5432/writesphere
+    depends_on:
+      db:
+        condition: service_healthy
+
+  web:
+    build: ./frontend
+    environment:
+      WRITESPHERE_API_ORIGIN: http://api:8080
+    ports:
+      - "127.0.0.1:4000:4000"
+    depends_on:
+      - api
+
+volumes:
+  postgres:

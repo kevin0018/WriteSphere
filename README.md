@@ -1,134 +1,48 @@
 # WriteSphere
 
-Una aplicación web moderna construida con Angular (frontend) y Spring Boot (backend).
+Publicación abierta de poemas y microrrelatos en español. El alcance y los
+criterios de aceptación están en [MVP.md](MVP.md).
 
-Propuesta de producto, arquitectura y criterios de entrega: [MVP de WriteSphere](MVP.md).
-## Requisitos del Sistema
+## Arranque con Docker
 
-### Requisitos Generales
-- **Sistema Operativo**: Linux o Windows
-- **Git**: Para clonar el repositorio
+Desde la raíz, ejecutar `docker compose up --build -d` y abrir
+[localhost:4000](http://localhost:4000). Compose conserva los datos en el volumen
+`postgres`. Para detener los servicios, ejecutar `docker compose down`.
 
-### Para el Frontend (Angular)
-- **Node.js**: versión 18.13.0 o superior
-- **npm**: versión 8.19.3 o superior
-- **Angular CLI**: versión 20.x.x o superior
+## Arranque local
 
-### Para el Backend (Spring Boot)
-- **Java JDK**: versión 17 o superior
-- **Maven**: versión 3.6.0 o superior (incluido en el proyecto con Maven Wrapper)
+Se necesitan Node.js 26.13.1 con pnpm 11.25.0, un JDK 25 y Docker Compose.
+El proyecto usa Angular, CLI y SSR 22.3.0, TypeScript 6.0.3, Tailwind CSS 4.3.5,
+spartan/ui Brain 1.10.0, Spring Boot 4.2.0 y PostgreSQL 18.7.
+El Maven Wrapper fija Maven 3.9.11.
 
-## Instalación
+Desde la raíz, iniciar PostgreSQL y después la API.
 
-### 1. Clonar el Repositorio
-
-```bash
-git clone https://github.com/kevin0018/WriteSphere.git
-cd WriteSphere
-```
-
-### 2. Configurar el Frontend (Angular)
-
-#### Instalar Node.js y npm
-
-**Ubuntu/Debian:**
-```bash
-sudo apt update
-sudo apt install nodejs npm
-```
-
-**Windows:**
-Descargar desde [nodejs.org](https://nodejs.org/)
-
-#### Instalar Angular CLI
-
-```bash
-npm install -g @angular/cli
-```
-
-#### Instalar dependencias del proyecto
-
-```bash
-cd frontend
-npm install
-```
-
-#### Ejecutar el servidor de desarrollo
-
-```bash
-ng serve
-```
-
-La aplicación estará disponible en `http://localhost:4200`
-
-### 3. Configurar el Backend (Spring Boot)
-
-#### Instalar Java JDK
-
-**Ubuntu/Debian:**
-```bash
-sudo apt update
-sudo apt install openjdk-17-jdk
-```
-
-**Windows:**
-Descargar desde [Oracle](https://www.oracle.com/java/technologies/javase-downloads.html) o [OpenJDK](https://openjdk.org/)
-
-#### Verificar la instalación de Java
-
-```bash
-java -version
-javac -version
-```
-
-#### Ejecutar la aplicación Spring Boot
-
-El proyecto incluye Maven Wrapper, por lo que no necesitas instalar Maven por separado:
-
-```bash
+```sh
+docker compose up -d --wait db
 cd backend
-
-# Linux/macOS
 ./mvnw spring-boot:run
-
-# Windows
-mvnw.cmd spring-boot:run
 ```
 
-La API estará disponible en `http://localhost:8080`
+En Windows se puede usar `mvnw.cmd`. Flyway aplica las migraciones al iniciar
+la API en el puerto 8080. Para usar otra instancia de PostgreSQL, configurar
+`WRITESPHERE_DB_URL`, `WRITESPHERE_DB_USER` y `WRITESPHERE_DB_PASSWORD`.
+Las credenciales predeterminadas corresponden a la base local de Compose.
 
-## Comandos Útiles
+En otra terminal, instalar y compilar el frontend.
 
-### Frontend
-```bash
-# Instalar dependencias
-npm install
-
-# Iniciar servidor de desarrollo
-npm start
-
-# Compilar para producción
-npm run build
-
-# Ejecutar tests
-npm test
-
-# Servidor SSR
-npm run serve:ssr:frontend
+```sh
+cd frontend
+pnpm install --frozen-lockfile
+pnpm build
+pnpm serve:ssr:frontend
 ```
 
-### Backend
-```bash
-# Compilar el proyecto
-./mvnw compile
+La aplicación SSR se abre en [localhost:4000](http://localhost:4000).
+Para desarrollo con recarga automática, usar `pnpm start` y abrir
+[localhost:4200](http://localhost:4200).
 
-# Ejecutar tests
-./mvnw test
+## Pruebas
 
-# Empaquetar la aplicación
-./mvnw package
-
-# Limpiar y compilar
-./mvnw clean install
-```
-
+Desde `frontend`, ejecutar `pnpm test --watch=false`. Desde `backend`,
+con PostgreSQL en marcha, ejecutar `./mvnw test`.
