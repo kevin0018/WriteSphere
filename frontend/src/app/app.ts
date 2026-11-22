@@ -1,24 +1,50 @@
-import { Component } from '@angular/core';
-import { RouterOutlet } from '@angular/router';
+import { afterNextRender, Component, inject, signal } from '@angular/core';
+import { Router, RouterLink, RouterOutlet } from '@angular/router';
+import { apiMessage } from './shared/infrastructure/api';
+import { SessionState } from './user/application/session';
 
 @Component({
   selector: 'app-root',
-  imports: [RouterOutlet],
+  imports: [RouterLink, RouterOutlet],
   template: `
-    <div class="min-h-screen bg-gray-50">
-      <header class="bg-white shadow">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div class="flex justify-between h-16">
-            <div class="flex items-center">
-              <h1 class="text-xl font-semibold text-gray-900">WriteSphere</h1>
-            </div>
-          </div>
-        </div>
-      </header>
-      <main>
-        <router-outlet />
-      </main>
-    </div>
-  `
+    <header class="masthead">
+      <div class="masthead-content">
+        <a class="wordmark" routerLink="/">WriteSphere</a>
+        <nav aria-label="Navegación principal">
+          @if (session.account().penName; as penName) {
+            <a routerLink="/escribir">Mis obras</a>
+            <button type="button" class="text-button" [disabled]="busy()" (click)="logout()">Salir</button>
+          } @else {
+            <a routerLink="/entrar">Entrar</a>
+            <a routerLink="/registro">Crear cuenta</a>
+          }
+        </nav>
+      </div>
+    </header>
+    @if (error()) { <p class="column error" role="alert">{{ error() }}</p> }
+    <main id="contenido"><router-outlet /></main>
+  `,
 })
-export class App {}
+export class App {
+  readonly session = inject(SessionState);
+  private readonly router = inject(Router);
+  readonly error = signal('');
+  readonly busy = signal(false);
+
+  constructor() {
+    afterNextRender(() => void this.session.refresh().catch(() => undefined));
+  }
+
+  async logout(): Promise<void> {
+    if (!(await this.router.navigateByUrl('/'))) return;
+    this.error.set('');
+    this.busy.set(true);
+    try {
+      await this.session.logout();
+    } catch (error) {
+      this.error.set(apiMessage(error));
+    } finally {
+      this.busy.set(false);
+    }
+  }
+}
