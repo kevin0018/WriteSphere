@@ -1,5 +1,5 @@
 import { HttpClient, HttpErrorResponse, HttpHeaders, HttpParams } from '@angular/common/http';
-import { inject, Injectable, InjectionToken } from '@angular/core';
+import { inject, Injectable, InjectionToken, makeStateKey, TransferState } from '@angular/core';
 import { firstValueFrom, switchMap } from 'rxjs';
 
 export const API_ORIGIN = new InjectionToken<string>('API origin', { factory: () => '' });
@@ -9,11 +9,22 @@ export class Api {
   private readonly http = inject(HttpClient);
   private readonly origin = inject(API_ORIGIN);
 
-  get<T>(path: string, params?: HttpParams): Promise<T> {
-    return firstValueFrom(this.http.get<T>(this.origin + '/api' + path, {
+  private readonly transfer = inject(TransferState);
+
+  async get<T>(path: string, params?: HttpParams): Promise<T> {
+    const key = makeStateKey<T>('/api' + path + '?' + (params?.toString() ?? ''));
+    const publicRead = path.startsWith('/public/');
+    if (publicRead && !this.origin && this.transfer.hasKey(key)) {
+      const result = this.transfer.get(key, null as T);
+      this.transfer.remove(key);
+      return result;
+    }
+    const result = await firstValueFrom(this.http.get<T>(this.origin + '/api' + path, {
       params,
-      transferCache: path.startsWith('/public/'),
+      transferCache: false,
     }));
+    if (publicRead && this.origin) this.transfer.set(key, result);
+    return result;
   }
 
   mutate<T>(method: 'POST' | 'PUT' | 'DELETE', path: string, body?: unknown): Promise<T> {

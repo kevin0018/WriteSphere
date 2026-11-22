@@ -83,3 +83,38 @@ textarea { resize: vertical; font-family: var(--serif); line-height: 1.6; }
   overflow-wrap: anywhere;
 }
 .index-row span { color: var(--muted); font-size: .9rem; }
+
+.genres, .pagination {
+  border-block-start: 1px solid var(--rule);
+  padding-block: .8rem;
+}
+.genres a { text-decoration: none; }
+.genres a[aria-current="page"] {
+  color: var(--ink);
+  text-decoration: underline;
+  font-weight: 650;
+}
+.work-card { border-block-start: 1px solid var(--rule); padding-block: 1.45rem; }
+.work-card h2 { margin-block: .35rem .2rem; }
+.work-card h2 a { color: var(--ink); text-decoration: none; }
+.work-card h2 a:hover { text-decoration: underline; }
+.genre {
+  color: var(--muted);
+  font-size: .78rem;
+  text-transform: uppercase;
+  letter-spacing: .12em;
+  font-weight: 650;
+}
+.byline { font-family: var(--serif); }
+.excerpt {
+  margin-block: .6rem;
+  font: 1.05rem/1.55 var(--serif);
+  overflow-wrap: anywhere;
+  white-space: pre-line;
+}
+.empty { padding-block: 1.25rem; }
+.pagination:empty, .reading-actions:empty { display: none; }
+.reading { max-width: 38rem; }
+.reading header { border-block-end: 1px solid var(--rule); padding-block-end: 1.35rem; }
+.reading h1 { margin-block: .5rem .65rem; }
+.reading-actions { margin-block-start: 2rem; }

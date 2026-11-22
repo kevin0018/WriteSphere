@@ -50,6 +50,9 @@ type SaveState = 'saved' | 'pending' | 'saving' | 'error' | 'conflict';
               Guardar mi texto sobre la última versión
             </button>
           }
+          @if (current.state === 'PUBLISHED') {
+            <a [routerLink]="['/obras', current.id]">Ver obra publicada</a>
+          }
           @if (current.state === 'DRAFT') {
             <button class="primary" [disabled]="locked() || saveState() === 'saving' || saveState() === 'conflict'"
               (click)="publish()">Publicar</button>

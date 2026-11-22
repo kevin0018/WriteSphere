@@ -11,7 +11,8 @@ import { SessionState } from './user/application/session';
       <div class="masthead-content">
         <a class="wordmark" routerLink="/">WriteSphere</a>
         <nav aria-label="Navegación principal">
-          @if (session.account().penName; as penName) {
+          @if (session.account().penName) {
+            <a routerLink="/estanteria">Estantería</a>
             <a routerLink="/escribir">Mis obras</a>
             <button type="button" class="text-button" [disabled]="busy()" (click)="logout()">Salir</button>
           } @else {
