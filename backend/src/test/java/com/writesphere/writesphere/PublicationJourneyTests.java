@@ -52,6 +52,25 @@ class PublicationJourneyTests {
     }
 
     @Test
+    void passkeyEnrollmentRequiresTheAccountPasswordAndLoginOptionsRequireCsrf() throws Exception {
+        String path = "/api/session/passkeys";
+        var anonymous = new Client();
+        anonymous.send(anonymous.request(path + "/login/options").POST(HttpRequest.BodyPublishers.noBody()), 403);
+        var challenge = anonymous.change("POST", path + "/login/options", null, 200);
+        assertThat(challenge.get("challenge").asText()).isNotBlank();
+        assertThat(challenge.get("userVerification").asText()).isEqualTo("required");
+        assertThat(challenge.get("allowCredentials").size()).isZero();
+        anonymous.change("POST", path + "/register/options", Map.of("password", PASSWORD), 401);
+
+        var author = member("author");
+        author.change("POST", path + "/register/options", Map.of("password", "wrong-password"), 401);
+        var options = author.change("POST", path + "/register/options", Map.of("password", PASSWORD), 200);
+        assertThat(options.get("user").get("name").asText()).isEqualTo(email("author"));
+        assertThat(options.get("authenticatorSelection").get("userVerification").asText()).isEqualTo("required");
+        assertThat(author.get(path, 200).size()).isZero();
+    }
+
+    @Test
     void withdrawImmediatelyRemovesTheWorkFromEveryPublicReadAndThePrivateBookshelf() throws Exception {
         var author = member("author");
         var reader = member("reader");

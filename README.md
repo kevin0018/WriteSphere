@@ -68,3 +68,19 @@ Las pruebas de backend usan PostgreSQL y cubren el control de versiones, la
 paginación con fechas empatadas, la retirada de una obra guardada y la resolución
 de reportes. Cada prueba de integración crea y elimina sus propias cuentas y
 obras.
+
+## Entrar con passkey
+
+En local, abrir [localhost:4000](http://localhost:4000), o
+[localhost:4200](http://localhost:4200) con el servidor de desarrollo.
+Tras iniciar sesión, abrir **Passkeys**, asignar un nombre y confirmar la
+contraseña actual para añadir una. En los siguientes accesos, **Entrar con
+passkey** funciona sin introducir correo ni contraseña. En **Passkeys** se
+pueden retirar credenciales de la cuenta.
+
+Para desplegar con HTTPS, configurar en el backend
+`WRITESPHERE_PASSKEY_RP_ID` con el dominio público sin puerto y
+`WRITESPHERE_PASSKEY_ORIGINS` con el origen HTTPS autorizado, incluyendo el
+puerto si no es el predeterminado. La configuración acepta una lista de
+orígenes separada por comas. Activar también `WRITESPHERE_SECURE_COOKIE=true`.
+Las credenciales quedan asociadas al dominio con el que se registraron.

@@ -19,6 +19,8 @@ export const routes: Routes = [
     loadComponent: () => import('./presentation/pages/moderation/moderation-page').then((m) => m.ModerationPage) },
   { path: 'entrar', title: 'Entrar · WriteSphere',
     loadComponent: () => import('./presentation/pages/auth/account-page').then((m) => m.AccountPage) },
+  { path: 'cuenta/passkeys', title: 'Passkeys · WriteSphere', canActivate: [requireSession],
+    loadComponent: () => import('./presentation/pages/auth/passkey-page').then((m) => m.PasskeyPage) },
   { path: 'registro', title: 'Crear cuenta · WriteSphere', data: { registering: true },
     loadComponent: () => import('./presentation/pages/auth/account-page').then((m) => m.AccountPage) },
   { path: 'escribir', pathMatch: 'full', title: 'Mis obras · WriteSphere', canActivate: [requireSession],

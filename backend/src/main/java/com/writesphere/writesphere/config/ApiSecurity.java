@@ -7,23 +7,33 @@ import com.writesphere.writesphere.user.infrastructure.SessionAccount;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
+import org.springframework.jdbc.core.simple.JdbcClient;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.crypto.password.Pbkdf2PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.csrf.HttpSessionCsrfTokenRepository;
+import org.springframework.security.web.webauthn.management.WebAuthnRelyingPartyOperations;
+import org.springframework.transaction.PlatformTransactionManager;
 
 @Configuration
 public class ApiSecurity {
     @Bean
-    SecurityFilterChain apiFilterChain(HttpSecurity http) throws Exception {
+    SecurityFilterChain apiFilterChain(HttpSecurity http, UserDetailsService accounts,
+                                       WebAuthnRelyingPartyOperations passkeyOperations, JdbcClient jdbc,
+                                       PlatformTransactionManager transactions) throws Exception {
+        var csrfTokens = new HttpSessionCsrfTokenRepository();
+        PasskeyLogin.configure(http, accounts, passkeyOperations, csrfTokens, jdbc, transactions);
         return http.authorizeHttpRequests(requests -> requests
                         .requestMatchers(HttpMethod.GET, "/api/public/**", "/api/session", "/api/csrf").permitAll()
-                        .requestMatchers(HttpMethod.POST, "/api/accounts", "/api/session/login").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/api/accounts", "/api/session/login",
+                                PasskeyLogin.OPTIONS, PasskeyLogin.VERIFY).permitAll()
                         .requestMatchers("/error").permitAll()
                         .requestMatchers("/api/moderation/**").hasRole("MODERATOR")
                         .anyRequest().authenticated())
+                .csrf(csrf -> csrf.csrfTokenRepository(csrfTokens))
                 .exceptionHandling(errors -> errors.authenticationEntryPoint(
                         (request, response, failure) -> response.setStatus(401)))
                 .formLogin(login -> login.loginProcessingUrl("/api/session/login")
