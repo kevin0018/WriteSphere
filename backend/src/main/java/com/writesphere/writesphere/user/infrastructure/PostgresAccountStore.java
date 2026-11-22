@@ -17,12 +17,12 @@ public class PostgresAccountStore implements AccountStore {
     }
 
     @Override
-    public boolean insert(Account account) {
+    public boolean insertMember(Account account) {
         return jdbc.sql("""
-                INSERT INTO accounts (id, email, pen_name, pen_name_key, password_hash, role)
-                VALUES (?, ?, ?, ?, ?, ?) ON CONFLICT DO NOTHING
+                INSERT INTO accounts (id, email, pen_name, pen_name_key, password_hash)
+                VALUES (?, ?, ?, ?, ?) ON CONFLICT DO NOTHING
                 """).params(account.id(), account.email(), account.penName(), account.penNameKey(),
-                account.passwordHash(), account.role().name()).update() == 1;
+                account.passwordHash()).update() == 1;
     }
 
     @Override

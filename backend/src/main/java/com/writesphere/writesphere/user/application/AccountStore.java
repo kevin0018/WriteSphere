@@ -5,7 +5,7 @@ import java.util.Optional;
 import com.writesphere.writesphere.user.domain.Account;
 
 public interface AccountStore {
-    boolean insert(Account account);
+    boolean insertMember(Account account);
 
     Optional<Account> findByEmail(String normalizedEmail);
 }

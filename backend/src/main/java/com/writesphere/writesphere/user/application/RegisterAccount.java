@@ -29,7 +29,7 @@ public class RegisterAccount {
         }
         var account = new Account(UUID.randomUUID(), email, penName, penNameKey,
                 passwords.encode(command.password()), Account.Role.MEMBER);
-        if (!accounts.insert(account)) {
+        if (!accounts.insertMember(account)) {
             throw new ApplicationProblem(ApplicationProblem.Kind.CONFLICT, "account_exists");
         }
     }

@@ -1,0 +1,105 @@
+name: writesphere-production
+
+services:
+  db:
+    image: postgres:18.7
+    environment:
+      POSTGRES_DB: writesphere
+      POSTGRES_USER: writesphere_admin
+      POSTGRES_PASSWORD_FILE: /run/secrets/db_admin_password
+      POSTGRES_HOST_AUTH_METHOD: scram-sha-256
+    secrets:
+      - db_admin_password
+      - db_migrator_password
+      - db_api_password
+    volumes:
+      - postgres:/var/lib/postgresql
+      - ./database/production/init-roles.sh:/docker-entrypoint-initdb.d/10-init-roles.sh:ro
+    networks:
+      - data
+    healthcheck:
+      test: ["CMD", "pg_isready", "-h", "127.0.0.1", "-U", "writesphere_admin", "-d", "writesphere"]
+      interval: 2s
+      timeout: 3s
+      retries: 30
+
+  migrate:
+    image: redgate/flyway:12.11.0
+    entrypoint: ["/bin/sh", "-ec"]
+    command:
+      - |
+        FLYWAY_PASSWORD="$$(cat /run/secrets/db_migrator_password)"
+        test -n "$$FLYWAY_PASSWORD"
+        export FLYWAY_PASSWORD
+        exec /flyway/flyway migrate
+    environment:
+      FLYWAY_URL: jdbc:postgresql://db:5432/writesphere
+      FLYWAY_USER: writesphere_migrator
+      FLYWAY_LOCATIONS: filesystem:/flyway/sql
+      FLYWAY_CALLBACK_LOCATIONS: filesystem:/flyway/callbacks
+      FLYWAY_CLEAN_DISABLED: "true"
+    secrets:
+      - db_migrator_password
+    volumes:
+      - ./backend/src/main/resources/db/migration:/flyway/sql:ro
+      - ./database/production/afterMigrate.sql:/flyway/callbacks/afterMigrate.sql:ro
+    networks:
+      - data
+    depends_on:
+      db:
+        condition: service_healthy
+
+  api:
+    build: ./backend
+    environment:
+      SPRING_CONFIG_IMPORT: configtree:/run/secrets/
+      SPRING_FLYWAY_ENABLED: "false"
+      WRITESPHERE_BIND_ADDRESS: 0.0.0.0
+      WRITESPHERE_DB_URL: jdbc:postgresql://db:5432/writesphere
+      WRITESPHERE_DB_USER: writesphere_api
+      WRITESPHERE_SECURE_COOKIE: ${WRITESPHERE_SECURE_COOKIE:-true}
+      WRITESPHERE_PASSKEY_RP_ID: ${WRITESPHERE_PUBLIC_HOST:?Set WRITESPHERE_PUBLIC_HOST}
+      WRITESPHERE_PASSKEY_ORIGINS: ${WRITESPHERE_PUBLIC_ORIGIN:?Set WRITESPHERE_PUBLIC_ORIGIN}
+    secrets:
+      - source: db_api_password
+        target: spring.datasource.password
+    networks:
+      - data
+      - web
+    depends_on:
+      migrate:
+        condition: service_completed_successfully
+    healthcheck:
+      test: ["CMD", "bash", "-ec", "exec 3<>/dev/tcp/127.0.0.1/8080"]
+      interval: 2s
+      timeout: 3s
+      retries: 30
+
+  web:
+    build: ./frontend
+    environment:
+      WRITESPHERE_API_ORIGIN: http://api:8080
+      NG_ALLOWED_HOSTS: ${WRITESPHERE_PUBLIC_HOST:?Set WRITESPHERE_PUBLIC_HOST}
+    ports:
+      - "127.0.0.1:${WRITESPHERE_WEB_PORT:-4000}:4000"
+    networks:
+      - web
+    depends_on:
+      api:
+        condition: service_healthy
+
+networks:
+  data:
+    internal: true
+  web:
+
+volumes:
+  postgres:
+
+secrets:
+  db_admin_password:
+    file: ${WRITESPHERE_SECRETS_DIR:?Set WRITESPHERE_SECRETS_DIR}/db_admin_password
+  db_migrator_password:
+    file: ${WRITESPHERE_SECRETS_DIR:?Set WRITESPHERE_SECRETS_DIR}/db_migrator_password
+  db_api_password:
+    file: ${WRITESPHERE_SECRETS_DIR:?Set WRITESPHERE_SECRETS_DIR}/db_api_password
