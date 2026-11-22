@@ -2,6 +2,7 @@
 
 Una aplicación web moderna construida con Angular (frontend) y Spring Boot (backend).
 
+Propuesta de producto, arquitectura y criterios de entrega: [MVP de WriteSphere](MVP.md).
 ## Requisitos del Sistema
 
 ### Requisitos Generales
