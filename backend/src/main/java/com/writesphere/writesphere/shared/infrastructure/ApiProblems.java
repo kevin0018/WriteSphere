@@ -18,6 +18,7 @@ public class ApiProblems {
     ResponseEntity<Map<String, String>> handle(ApplicationProblem problem) {
         int status = switch (problem.kind()) {
             case INVALID -> 400;
+            case FORBIDDEN -> 403;
             case NOT_FOUND -> 404;
             case CONFLICT -> 409;
         };

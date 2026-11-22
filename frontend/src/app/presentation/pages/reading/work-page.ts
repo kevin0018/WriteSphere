@@ -6,9 +6,11 @@ import { genreLabels } from '../../../post/application/works';
 import { WorkText } from '../../components/layout/work-text';
 import { BookmarkButton } from './bookmark-button';
 import { PublicError } from './public-error';
+import { ReportForm } from './report-form';
+import { SessionState } from '../../../user/application/session';
 
 @Component({
-  imports: [RouterLink, WorkText, BookmarkButton, PublicError],
+  imports: [RouterLink, WorkText, BookmarkButton, PublicError, ReportForm],
   template: `
     @if (result().value; as work) {
       <article class="column reading">
@@ -18,9 +20,12 @@ import { PublicError } from './public-error';
           <a class="byline" [routerLink]="['/autores', work.authorId]">{{ work.penName }}</a>
         </header>
         <app-work-text [body]="work.body" />
-        <div class="toolbar reading-actions">
-          <app-bookmark-button [id]="work.id" />
-        </div>
+        @if (session.account().penName) {
+          <div class="reading-actions">
+            <app-bookmark-button [id]="work.id" />
+            @for (id of [work.id]; track id) { <app-report-form [id]="id" /> }
+          </div>
+        }
       </article>
     } @else { <app-public-error [status]="result().status" /> }
   `,
@@ -28,6 +33,7 @@ import { PublicError } from './public-error';
 export class WorkPageComponent {
   readonly result = input.required<PublicResult<PublicWork>>();
   readonly genres = genreLabels;
+  readonly session = inject(SessionState);
   private readonly title = inject(Title);
 
   constructor() {

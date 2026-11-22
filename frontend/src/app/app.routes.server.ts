@@ -5,6 +5,7 @@ export const serverRoutes: ServerRoute[] = [
   { path: 'registro', renderMode: RenderMode.Client },
   { path: 'escribir', renderMode: RenderMode.Client },
   { path: 'escribir/:id', renderMode: RenderMode.Client },
+  { path: 'moderacion', renderMode: RenderMode.Client },
   { path: 'estanteria', renderMode: RenderMode.Client },
   { path: '', renderMode: RenderMode.Server },
   { path: 'obras/:id', renderMode: RenderMode.Server },

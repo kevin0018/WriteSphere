@@ -1,15 +1,16 @@
 import { HttpErrorResponse } from '@angular/common/http';
 import { Component, DestroyRef, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { ActivatedRoute, CanDeactivateFn, RouterLink } from '@angular/router';
+import { ActivatedRoute, RouterLink } from '@angular/router';
 import { EditorWork, Genre, Manuscript, stateLabels } from '../../../post/application/works';
 import { Api, apiMessage } from '../../../shared/infrastructure/api';
+import { WithdrawalDialog } from './withdrawal-dialog';
 import { WorkText } from '../../components/layout/work-text';
 
 type SaveState = 'saved' | 'pending' | 'saving' | 'error' | 'conflict';
 
 @Component({
-  imports: [FormsModule, RouterLink, WorkText],
+  imports: [FormsModule, RouterLink, WorkText, WithdrawalDialog],
   host: { '(window:beforeunload)': 'beforeUnload($event)' },
   template: `
     <section class="column editor">
@@ -52,10 +53,12 @@ type SaveState = 'saved' | 'pending' | 'saving' | 'error' | 'conflict';
           }
           @if (current.state === 'PUBLISHED') {
             <a [routerLink]="['/obras', current.id]">Ver obra publicada</a>
+            <app-withdrawal-dialog [disabled]="locked() || saveState() === 'saving' || saveState() === 'conflict'"
+              (confirmed)="changePublication('withdraw')" />
           }
           @if (current.state === 'DRAFT') {
             <button class="primary" [disabled]="locked() || saveState() === 'saving' || saveState() === 'conflict'"
-              (click)="publish()">Publicar</button>
+              (click)="changePublication('publish')">Publicar</button>
           }
         </div>
       } @else if (error()) { <p class="error" role="alert">{{ error() }}</p> }
@@ -166,14 +169,14 @@ export class EditorPage {
     }
   }
 
-  async publish(): Promise<void> {
+  async changePublication(action: 'publish' | 'withdraw'): Promise<void> {
     this.publishing.set(true);
     try {
       if (!(await this.save())) return;
       const work = this.work();
       if (!work) return;
       this.error.set('');
-      this.work.set(await this.api.mutate<EditorWork>('POST', this.path + '/publish', { version: work.version }));
+      this.work.set(await this.api.mutate<EditorWork>('POST', this.path + '/' + action, { version: work.version }));
     } catch (error) {
       if (error instanceof HttpErrorResponse && error.error?.code === 'work_conflict') this.failed(error);
       else this.error.set(apiMessage(error));
@@ -190,6 +193,3 @@ export class EditorPage {
     return this.saveState() !== 'saved';
   }
 }
-
-export const guardUnsavedWork: CanDeactivateFn<EditorPage> = (editor) =>
-  !editor.unsaved() || window.confirm('Hay cambios sin guardar. ¿Salir del editor?');

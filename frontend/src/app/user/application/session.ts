@@ -37,3 +37,11 @@ export const requireSession: CanActivateFn = async () => {
   const account = await session.refresh().catch(() => null);
   return account?.penName ? true : router.createUrlTree(['/entrar']);
 };
+
+export const requireModerator: CanActivateFn = async () => {
+  const session = inject(SessionState);
+  const router = inject(Router);
+  const account = await session.refresh().catch(() => null);
+  if (!account?.penName) return router.createUrlTree(['/entrar']);
+  return account.moderator ? true : router.createUrlTree(['/']);
+};

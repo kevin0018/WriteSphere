@@ -14,6 +14,7 @@ import { SessionState } from './user/application/session';
           @if (session.account().penName) {
             <a routerLink="/estanteria">Estantería</a>
             <a routerLink="/escribir">Mis obras</a>
+            @if (session.account().moderator) { <a routerLink="/moderacion">Moderación</a> }
             <button type="button" class="text-button" [disabled]="busy()" (click)="logout()">Salir</button>
           } @else {
             <a routerLink="/entrar">Entrar</a>

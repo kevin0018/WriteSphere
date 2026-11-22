@@ -1,7 +1,7 @@
 package com.writesphere.writesphere.shared.application;
 
 public final class ApplicationProblem extends RuntimeException {
-    public enum Kind { INVALID, NOT_FOUND, CONFLICT }
+    public enum Kind { INVALID, FORBIDDEN, NOT_FOUND, CONFLICT }
 
     private final Kind kind;
 

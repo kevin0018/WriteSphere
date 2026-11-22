@@ -1,8 +1,8 @@
 import { Routes } from '@angular/router';
 import { resolveFeed, resolveProfile, resolveWork } from './post/application/public-works';
 import { PublicError } from './presentation/pages/reading/public-error';
-import { guardUnsavedWork } from './presentation/pages/editor/editor-page';
-import { requireSession } from './user/application/session';
+import { guardUnsavedWork } from './presentation/guards/unsaved-work';
+import { requireModerator, requireSession } from './user/application/session';
 
 export const routes: Routes = [
   { path: '', pathMatch: 'full', title: 'WriteSphere', resolve: { feed: resolveFeed },
@@ -15,6 +15,8 @@ export const routes: Routes = [
     loadComponent: () => import('./presentation/pages/reading/profile-page').then((m) => m.ProfilePage) },
   { path: 'estanteria', title: 'Mi estantería · WriteSphere', canActivate: [requireSession],
     loadComponent: () => import('./presentation/pages/bookshelf/bookshelf-page').then((m) => m.BookshelfPage) },
+  { path: 'moderacion', title: 'Moderación · WriteSphere', canActivate: [requireModerator],
+    loadComponent: () => import('./presentation/pages/moderation/moderation-page').then((m) => m.ModerationPage) },
   { path: 'entrar', title: 'Entrar · WriteSphere',
     loadComponent: () => import('./presentation/pages/auth/account-page').then((m) => m.AccountPage) },
   { path: 'registro', title: 'Crear cuenta · WriteSphere', data: { registering: true },

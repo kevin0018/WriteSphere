@@ -1,4 +1,5 @@
 @import "tailwindcss";
+@import "@angular/cdk/overlay-prebuilt.css";
 
 :root {
   color-scheme: light;
@@ -118,3 +119,18 @@ textarea { resize: vertical; font-family: var(--serif); line-height: 1.6; }
 .reading header { border-block-end: 1px solid var(--rule); padding-block-end: 1.35rem; }
 .reading h1 { margin-block: .5rem .65rem; }
 .reading-actions { margin-block-start: 2rem; }
+
+.withdrawal-backdrop { background: rgb(25 40 31 / 58%); }
+.withdrawal-dialog {
+  width: min(28rem, calc(100vw - 2rem));
+  background: var(--paper);
+  color: var(--ink);
+  padding: clamp(1rem, 5vw, 2rem);
+  border: 1px solid var(--rule);
+  border-block-start: .35rem solid var(--ink);
+  box-shadow: 0 1rem 3rem rgb(25 40 31 / 22%);
+}
+.withdrawal-dialog p { margin-block: .9rem 1.35rem; }
+.reading-actions { display: grid; gap: 1rem; }
+.reading-actions summary { cursor: pointer; color: var(--accent); text-decoration: underline; }
+button[aria-pressed="true"] { box-shadow: inset 0 0 0 1px currentColor; }

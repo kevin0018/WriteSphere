@@ -5,7 +5,7 @@ criterios de aceptación están en [MVP.md](MVP.md).
 
 ## Arranque con Docker
 
-Desde la raíz, ejecutar `docker compose up --build -d` y abrir
+Desde la raíz, ejecutar `docker compose up --build -d --wait` y abrir
 [localhost:4000](http://localhost:4000). Compose conserva los datos en el volumen
 `postgres`. Para detener los servicios, ejecutar `docker compose down`.
 
@@ -46,3 +46,25 @@ Para desarrollo con recarga automática, usar `pnpm start` y abrir
 
 Desde `frontend`, ejecutar `pnpm test --watch=false`. Desde `backend`,
 con PostgreSQL en marcha, ejecutar `./mvnw test`.
+
+## Moderación local
+
+Registrar una cuenta con el correo elegido para moderación. Desde la raíz del
+repositorio, ejecutar lo siguiente con el correo de esa cuenta.
+
+```sh
+docker compose exec db psql -U writesphere -d writesphere
+```
+
+```sql
+UPDATE accounts SET role = 'MODERATOR' WHERE email = 'moderacion@example.org';
+```
+
+El correo se guarda normalizado en minúsculas. Salir de la sesión de la cuenta y
+volver a entrar para acceder a **Moderación**. La cuenta puede consultar los
+reportes pendientes y las resoluciones recientes.
+
+Las pruebas de backend usan PostgreSQL y cubren el control de versiones, la
+paginación con fechas empatadas, la retirada de una obra guardada y la resolución
+de reportes. Cada prueba de integración crea y elimina sus propias cuentas y
+obras.

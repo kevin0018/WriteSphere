@@ -49,8 +49,7 @@ public class ApiSecurity {
     @Bean
     UserDetailsService userDetailsService(AccountStore accounts) {
         return email -> accounts.findByEmail(Account.normalize(email))
-                .map(account -> new SessionAccount(account.id(), account.email(), account.penName(),
-                        account.role(), account.passwordHash()))
+                .map(SessionAccount::new)
                 .orElseThrow(() -> new UsernameNotFoundException("Unknown account"));
     }
 }

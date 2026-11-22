@@ -46,6 +46,7 @@ export function apiMessage(error: unknown): string {
     case 'account_exists': return 'El correo o el seudónimo ya está en uso.';
     case 'work_incomplete': return 'Añade un título y un texto antes de publicar.';
     case 'work_hidden': return 'Moderación ha ocultado esta obra.';
+    case 'report_resolved': return 'Otro moderador ya resolvió este reporte.';
     case 'work_conflict': return 'La obra cambió en otra pestaña. Tu texto sigue aquí.';
     case 'invalid_input': return 'Revisa los campos e inténtalo de nuevo.';
     default: return 'No se pudo completar la operación. Inténtalo de nuevo.';
