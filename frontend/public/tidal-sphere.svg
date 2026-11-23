@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" fill="none">
+  <style>
+    .tide { stroke: #3f488a; }
+    @media (prefers-color-scheme: dark) {
+      .tide { stroke: #c6caff; }
+    }
+  </style>
+  <g class="tide" stroke-width="2" stroke-linecap="round">
+    <circle cx="16" cy="16" r="13.25"/>
+    <path d="M8 10.5c3.2-2.3 5.4-2.3 8 0s4.8 2.3 8 0
+             M6.75 16c3.7-2.6 6.3-2.6 9.25 0s5.55 2.6 9.25 0
+             M8 21.5c3.2-2.3 5.4-2.3 8 0s4.8 2.3 8 0"/>
+  </g>
+</svg>

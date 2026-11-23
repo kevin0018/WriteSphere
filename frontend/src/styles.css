@@ -52,8 +52,24 @@ h2 { font-size: clamp(1.7rem, 4vw, 2.7rem); letter-spacing: -.035em; }
 .masthead nav { align-items: center; justify-content: end; gap: .25rem; }
 .masthead .wordmark { justify-self: start; }
 .masthead button.theme-switch { grid-column: -2 / -1; justify-self: end; }
-.wordmark { color: var(--ink); font-size: clamp(1.6rem, 4vw, 2.45rem); text-decoration: none; letter-spacing: -.06em; }
-.wordmark span { color: var(--accent); }
+.wordmark {
+  display: inline-flex;
+  align-items: center;
+  gap: .22em;
+  color: var(--ink);
+  font-size: clamp(1.6rem, 4vw, 2.45rem);
+  text-decoration: none;
+  letter-spacing: -.06em;
+  white-space: nowrap;
+}
+.wordmark::before {
+  content: '';
+  flex: 0 0 .92em;
+  height: .92em;
+  background-color: var(--accent);
+  mask: url('/tidal-sphere.svg') center / contain no-repeat;
+}
+.wordmark-accent { color: var(--accent); }
 nav, .toolbar { display: flex; flex-wrap: wrap; align-items: baseline; gap: .65rem 1rem; }
 nav a, .text-button { font-size: .9rem; }
 .text-button { color: var(--accent); text-decoration: underline; text-underline-offset: .2em; }

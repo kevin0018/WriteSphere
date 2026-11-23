@@ -11,7 +11,7 @@ import { SessionState } from './user/application/session';
   template: `
     <header class="masthead">
       <div class="masthead-content">
-        <a class="wordmark" routerLink="/">Write<span>Sphere</span></a>
+        <a class="wordmark" routerLink="/"><span>Write<span class="wordmark-accent">Sphere</span></span></a>
         @if (session.account().penName || !onAccountScreen()) {
           <nav aria-label="Navegación principal">
             @if (session.account().penName) {
