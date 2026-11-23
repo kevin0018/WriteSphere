@@ -3,11 +3,24 @@
 Publicación abierta de poemas y microrrelatos en español. El alcance y los
 criterios de aceptación están en [MVP.md](MVP.md).
 
+## Interfaz
+
+El diseño **Atlas de mareas** usa cartas marinas en la portada y en la
+estantería, una sola columna para leer cada obra y una esfera con tres olas
+como símbolo de WriteSphere.
+
+El selector de sol y luna de la cabecera alterna entre claro y oscuro. Al
+abrir la web por primera vez se aplica la preferencia del sistema. Si cambias
+el tema, se guarda en ese navegador.
+
 ## Arranque con Docker
 
 Desde la raíz, ejecutar `docker compose up --build -d --wait` y abrir
 [localhost:4000](http://localhost:4000). Compose conserva los datos en el volumen
 `postgres`. Para detener los servicios, ejecutar `docker compose down`.
+
+Si el entorno ya está en marcha, puedes reconstruir solo el frontend con
+`docker compose up -d --build --no-deps web` y recargar la página.
 
 ## Arranque local
 
@@ -69,14 +82,14 @@ paginación con fechas empatadas, la retirada de una obra guardada y la resoluci
 de reportes. Cada prueba de integración crea y elimina sus propias cuentas y
 obras.
 
-## Entrar con passkey
+## Iniciar sesión con passkey
 
 En local, abrir [localhost:4000](http://localhost:4000), o
 [localhost:4200](http://localhost:4200) con el servidor de desarrollo.
 Tras iniciar sesión, abrir **Passkeys**, asignar un nombre y confirmar la
-contraseña actual para añadir una. En los siguientes accesos, **Entrar con
-passkey** funciona sin introducir correo ni contraseña. En **Passkeys** se
-pueden retirar credenciales de la cuenta.
+contraseña actual para añadir una. En los siguientes accesos, **Usar una
+passkey** permite iniciar sesión sin introducir correo ni contraseña. En
+**Passkeys** se pueden retirar credenciales de la cuenta.
 
 Para desplegar con HTTPS, configurar en el backend
 `WRITESPHERE_PASSKEY_RP_ID` con el dominio público sin puerto y
