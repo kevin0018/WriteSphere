@@ -1,35 +1,37 @@
 # WriteSphere
 
-Publicación abierta de poemas y microrrelatos en español. El alcance y los
-criterios de aceptación están en [MVP.md](MVP.md).
+WriteSphere es una aplicación web para escribir, publicar y leer poemas y
+microrrelatos en español. Incluye un editor con autoguardado y control de
+versiones, una estantería personal, acceso con contraseña o passkey y
+moderación de reportes.
 
-## Interfaz
+## Arquitectura
 
-El diseño **Atlas de mareas** usa cartas marinas en la portada y en la
-estantería, una sola columna para leer cada obra y una esfera con tres olas
-como símbolo de WriteSphere.
+| Componente | Implementación |
+| --- | --- |
+| [Frontend](frontend/) | Angular 22 con TypeScript, renderizado en servidor para las vistas públicas, Tailwind CSS y Spartan NG. |
+| [Backend](backend/) | API REST con Spring Boot 4, Java 25, Spring Security y Spring Data JPA. |
+| [Persistencia](database/database-schema.md) | PostgreSQL 18 y migraciones versionadas con Flyway. |
 
-El selector de sol y luna de la cabecera alterna entre claro y oscuro. Al
-abrir la web por primera vez se aplica la preferencia del sistema. Si cambias
-el tema, se guarda en ese navegador.
+## Ejecución con Docker
 
-## Arranque con Docker
+Con Docker y Docker Compose instalados, ejecuta desde la raíz del repositorio:
 
-Desde la raíz, ejecutar `docker compose up --build -d --wait` y abrir
-[localhost:4000](http://localhost:4000). Compose conserva los datos en el volumen
-`postgres`. Para detener los servicios, ejecutar `docker compose down`.
+```sh
+docker compose up --build -d --wait
+```
 
-Si el entorno ya está en marcha, puedes reconstruir solo el frontend con
-`docker compose up -d --build --no-deps web` y recargar la página.
+Abre [localhost:4000](http://localhost:4000). El volumen `postgres` conserva los
+datos al detener el entorno con `docker compose down`. Si la API ya está en
+marcha, puedes reconstruir solo el frontend con
+`docker compose up -d --build --no-deps web`.
 
-## Arranque local
+## Desarrollo local
 
-Se necesitan Node.js 26.13.1 con pnpm 11.25.0, un JDK 25 y Docker Compose.
-El proyecto usa Angular, CLI y SSR 22.3.0, TypeScript 6.0.3, Tailwind CSS 4.3.5,
-spartan/ui Brain 1.10.0, Spring Boot 4.2.0 y PostgreSQL 18.7.
-El Maven Wrapper fija Maven 3.9.11.
+Necesitas Node.js 26.13.1, pnpm 11.25.0, JDK 25 y Docker Compose. El Maven
+Wrapper utiliza Maven 3.9.11.
 
-Desde la raíz, iniciar PostgreSQL y después la API.
+Inicia PostgreSQL y la API desde la raíz:
 
 ```sh
 docker compose up -d --wait db
@@ -37,110 +39,32 @@ cd backend
 ./mvnw spring-boot:run
 ```
 
-En Windows se puede usar `mvnw.cmd`. Flyway aplica las migraciones al iniciar
-la API en el puerto 8080. Para usar otra instancia de PostgreSQL, configurar
-`WRITESPHERE_DB_URL`, `WRITESPHERE_DB_USER` y `WRITESPHERE_DB_PASSWORD`.
-Las credenciales predeterminadas corresponden a la base local de Compose.
+En Windows, usa `mvnw.cmd`. La API escucha en el puerto 8080 y Flyway aplica
+las migraciones al arrancar. Para usar otra instancia de PostgreSQL,
+configura `WRITESPHERE_DB_URL`, `WRITESPHERE_DB_USER` y
+`WRITESPHERE_DB_PASSWORD`.
 
-En otra terminal, instalar y compilar el frontend.
+En otra terminal, arranca el frontend:
 
 ```sh
 cd frontend
 pnpm install --frozen-lockfile
-pnpm build
-pnpm serve:ssr:frontend
+pnpm start
 ```
 
-La aplicación SSR se abre en [localhost:4000](http://localhost:4000).
-Para desarrollo con recarga automática, usar `pnpm start` y abrir
-[localhost:4200](http://localhost:4200).
+Abre [localhost:4200](http://localhost:4200) para desarrollar con recarga
+automática. Para probar el renderizado en servidor, ejecuta `pnpm build` y
+`pnpm serve:ssr:frontend` desde `frontend` y abre
+[localhost:4000](http://localhost:4000).
 
 ## Pruebas
 
-Desde `frontend`, ejecutar `pnpm test --watch=false`. Desde `backend`,
-con PostgreSQL en marcha, ejecutar `./mvnw test`.
+- **Frontend:** ejecuta `pnpm test --watch=false` desde `frontend`.
+- **Backend:** con PostgreSQL en marcha, ejecuta `./mvnw test` desde `backend`.
 
-## Moderación local
+## Despliegue
 
-Registrar una cuenta con el correo elegido para moderación. Desde la raíz del
-repositorio, ejecutar lo siguiente con el correo de esa cuenta.
-
-```sh
-docker compose exec db psql -U writesphere -d writesphere
-```
-
-```sql
-UPDATE accounts SET role = 'MODERATOR' WHERE email = 'moderacion@example.org';
-```
-
-El correo se guarda normalizado en minúsculas. Salir de la sesión de la cuenta y
-volver a entrar para acceder a **Moderación**. La cuenta puede consultar los
-reportes pendientes y las resoluciones recientes.
-
-Las pruebas de backend usan PostgreSQL y cubren el control de versiones, la
-paginación con fechas empatadas, la retirada de una obra guardada y la resolución
-de reportes. Cada prueba de integración crea y elimina sus propias cuentas y
-obras.
-
-## Iniciar sesión con passkey
-
-En local, abrir [localhost:4000](http://localhost:4000), o
-[localhost:4200](http://localhost:4200) con el servidor de desarrollo.
-Tras iniciar sesión, abrir **Passkeys**, asignar un nombre y confirmar la
-contraseña actual para añadir una. En los siguientes accesos, **Usar una
-passkey** permite iniciar sesión sin introducir correo ni contraseña. En
-**Passkeys** se pueden retirar credenciales de la cuenta.
-
-Para desplegar con HTTPS, configurar en el backend
-`WRITESPHERE_PASSKEY_RP_ID` con el dominio público sin puerto y
-`WRITESPHERE_PASSKEY_ORIGINS` con el origen HTTPS autorizado, incluyendo el
-puerto si no es el predeterminado. La configuración acepta una lista de
-orígenes separada por comas. Activar también `WRITESPHERE_SECURE_COOKIE=true`.
-Las credenciales quedan asociadas al dominio con el que se registraron.
-
-## PostgreSQL en producción
-
-Usar `compose.production.yaml` directamente. Crea un proyecto y un volumen
-propios. PostgreSQL queda en una red interna de Docker y la web escucha en el
-bucle local para un proxy inverso con HTTPS. Configurar el proxy para conservar
-el encabezado `Host` público.
-
-Preparar tres contraseñas distintas antes de inicializar el volumen. Los
-archivos quedan legibles para los usuarios de los contenedores. En el host,
-el acceso se controla con el directorio privado que los contiene.
-
-```sh
-export WRITESPHERE_SECRETS_DIR="$HOME/.config/writesphere/secrets"
-install -d -m 0700 "$WRITESPHERE_SECRETS_DIR"
-(
-  set -eC
-  umask 077
-  for role in admin migrator api; do
-    secret_file="$WRITESPHERE_SECRETS_DIR/db_${role}_password"
-    openssl rand -hex 32 > "$secret_file"
-    chmod 0444 "$secret_file"
-  done
-)
-
-export WRITESPHERE_PUBLIC_HOST=escritura.example.org
-export WRITESPHERE_PUBLIC_ORIGIN=https://escritura.example.org
-docker compose -f compose.production.yaml up --build -d --wait
-```
-
-`writesphere_admin` inicializa PostgreSQL. El servicio temporal `migrate`
-aplica Flyway como `writesphere_migrator` y concede por tabla los permisos de
-`writesphere_api`. La API recibe solo su propia contraseña. Puede operar sobre
-los datos del producto con los permisos de cada tabla. La creación de
-cuentas usa el rol `MEMBER` asignado por PostgreSQL. El usuario de la API
-carece de permisos para cambiar ese rol, administrar el esquema o consultar
-el historial de Flyway.
-
-Para conceder el rol de moderación, abrir `psql` como administrador con
-`docker compose -f compose.production.yaml exec db psql -U writesphere_admin -d writesphere`
-y ejecutar la actualización de rol de la sección de moderación.
-
-Los scripts de inicialización se ejecutan al crear un volumen vacío. Para
-incorporar datos de una instalación anterior, restaurarlos en el volumen de
-producción con los roles ya creados y conservar la propiedad de las tablas en
-`writesphere_migrator`. Cambiar un archivo de secreto de un volumen existente
-requiere rotar también la contraseña del rol en PostgreSQL.
+[compose.production.yaml](compose.production.yaml) define un entorno con
+PostgreSQL en una red interna y credenciales separadas para administración,
+migraciones y API. La [guía de operación](docs/operations.md) documenta los
+secretos, el proxy HTTPS, las passkeys y la gestión de moderadores.
