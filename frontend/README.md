@@ -1,59 +1,22 @@
-# Frontend
+# Frontend de WriteSphere
 
-This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 20.1.4.
+Angular 22 sirve la portada, las obras y los perfiles públicos mediante SSR.
+Las vistas de cuenta, editor, estantería y moderación se cargan en el cliente.
 
-## Development server
+El frontend requiere Node.js 26.13.1 y pnpm 11.25.0. Ejecutar los comandos desde este directorio.
 
-To start a local development server, run:
-
-```bash
-ng serve
+```sh
+pnpm install --frozen-lockfile
+pnpm test --watch=false
+pnpm build
+pnpm serve:ssr:frontend
 ```
 
-Once the server is running, open your browser and navigate to `http://localhost:4200/`. The application will automatically reload whenever you modify any of the source files.
+La aplicación SSR está disponible en [localhost:4000](http://localhost:4000).
+Para desarrollo con recarga automática, `pnpm start` sirve la aplicación en
+[localhost:4200](http://localhost:4200). Ambos servidores usan la API local
+por defecto. El servidor SSR admite `WRITESPHERE_API_ORIGIN` para apuntar a
+otro origen de backend.
 
-## Code scaffolding
-
-Angular CLI includes powerful code scaffolding tools. To generate a new component, run:
-
-```bash
-ng generate component component-name
-```
-
-For a complete list of available schematics (such as `components`, `directives`, or `pipes`), run:
-
-```bash
-ng generate --help
-```
-
-## Building
-
-To build the project run:
-
-```bash
-ng build
-```
-
-This will compile your project and store the build artifacts in the `dist/` directory. By default, the production build optimizes your application for performance and speed.
-
-## Running unit tests
-
-To execute unit tests with the [Karma](https://karma-runner.github.io) test runner, use the following command:
-
-```bash
-ng test
-```
-
-## Running end-to-end tests
-
-For end-to-end (e2e) testing, run:
-
-```bash
-ng e2e
-```
-
-Angular CLI does not come with an end-to-end testing framework by default. You can choose one that suits your needs.
-
-## Additional Resources
-
-For more information on using the Angular CLI, including detailed command references, visit the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.
+El [README del proyecto](../README.md) describe el arranque completo con
+PostgreSQL y Docker Compose.
