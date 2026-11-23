@@ -1,23 +1,35 @@
 import { Component, inject, signal } from '@angular/core';
 import { RouterLink } from '@angular/router';
+import { BrnButton } from '@spartan-ng/brain/button';
 import { PublicSummary } from '../../../post/application/public-works';
 import { Api, apiMessage } from '../../../shared/infrastructure/api';
 import { WorkCard } from '../reading/work-card';
 
 @Component({
-  imports: [WorkCard, RouterLink],
+  imports: [BrnButton, WorkCard, RouterLink],
   template: `
-    <section class="column">
-      <h1>Mi estantería</h1>
+    <section class="column bookshelf">
+      <header class="atlas-heading">
+        <h1>Mi estantería</h1>
+        @if (works(); as items) {
+          <p class="atlas-meta">{{ items.length }} {{ items.length === 1 ? 'obra guardada' : 'obras guardadas' }}</p>
+        }
+      </header>
       @if (error()) { <p class="error" role="alert">{{ error() }}</p> }
       @if (works(); as items) {
-        @for (work of items; track work.id) {
-          <app-work-card [work]="work">
-            <button class="text-button" type="button" [disabled]="busy() === work.id" (click)="remove(work.id)">
-              Quitar de mi estantería
-            </button>
-          </app-work-card>
-        } @empty { <p>Tu estantería está vacía. <a routerLink="/">Explorar obras</a></p> }
+        @if (items.length) {
+          <ul class="shelf-grid" aria-label="Obras guardadas">
+            @for (work of items; track work.id) {
+              <li>
+                <app-work-card [work]="work" layout="cover">
+                  <button brnButton class="text-button shelf-remove" type="button"
+                    [disabled]="!!busy()" (click)="remove(work.id)"
+                    [attr.aria-label]="'Quitar de mi estantería: ' + work.title">Quitar de mi estantería</button>
+                </app-work-card>
+              </li>
+            }
+          </ul>
+        } @else { <p>Tu estantería está vacía. <a routerLink="/">Explorar obras</a></p> }
       } @else if (!error()) { <p role="status">Cargando tu estantería…</p> }
     </section>
   `,

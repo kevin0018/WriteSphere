@@ -2,6 +2,9 @@ import { HttpErrorResponse } from '@angular/common/http';
 import { Component, DestroyRef, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, RouterLink } from '@angular/router';
+import { BrnButton } from '@spartan-ng/brain/button';
+import { BrnInput } from '@spartan-ng/brain/input';
+import { BrnTextarea } from '@spartan-ng/brain/textarea';
 import { EditorWork, Genre, Manuscript, stateLabels } from '../../../post/application/works';
 import { Api, apiMessage } from '../../../shared/infrastructure/api';
 import { WithdrawalDialog } from './withdrawal-dialog';
@@ -10,54 +13,55 @@ import { WorkText } from '../../components/layout/work-text';
 type SaveState = 'saved' | 'pending' | 'saving' | 'error' | 'conflict';
 
 @Component({
-  imports: [FormsModule, RouterLink, WorkText, WithdrawalDialog],
+  imports: [BrnButton, BrnInput, BrnTextarea, FormsModule, RouterLink, WorkText, WithdrawalDialog],
   host: { '(window:beforeunload)': 'beforeUnload($event)' },
   template: `
     <section class="column editor">
-      <a routerLink="/escribir">← Mis obras</a>
+      <a class="editor-back" routerLink="/escribir"><span aria-hidden="true">←</span> Mis obras</a>
       @if (work(); as current) {
-        <h1>{{ current.state === 'PUBLISHED' ? 'Editar obra' : 'Editar borrador' }}</h1>
-        <div class="toolbar editor-bar">
-          <button type="button" class="secondary" [attr.aria-pressed]="preview()" (click)="preview.set(!preview())">
-            {{ preview() ? 'Volver a la edición' : 'Vista previa' }}
-          </button>
-          <span class="hint">{{ states[current.state] }}</span>
-        </div>
+        <header class="editor-heading">
+          <h1>{{ current.state === 'PUBLISHED' ? 'Editar obra' : 'Editar borrador' }}</h1>
+          <div class="toolbar editor-tools">
+            <span class="work-state" [attr.data-state]="current.state">{{ states[current.state] }}</span>
+            <button brnButton type="button" class="secondary"
+              [attr.aria-pressed]="preview()" (click)="preview.set(!preview())">Vista previa</button>
+          </div>
+        </header>
         @if (preview()) {
-          <article class="preview">
+          <article class="editorial-panel editor-preview">
             <h2>{{ manuscript.title || 'Sin título' }}</h2>
             <app-work-text [body]="manuscript.body" />
           </article>
         } @else {
-          <div class="form-stack">
+          <div class="manuscript">
             <label>Género <select name="genre" [disabled]="locked()" [ngModel]="manuscript.genre"
               (ngModelChange)="changeGenre($event)">
               <option value="POEM">Poema</option><option value="MICROFICTION">Microrrelato</option>
             </select></label>
-            <label>Título <input name="title" maxlength="160" [disabled]="locked()" [ngModel]="manuscript.title"
+            <label>Título <input brnInput name="title" maxlength="160" [disabled]="locked()" [ngModel]="manuscript.title"
               (ngModelChange)="changeText('title', $event)"></label>
-            <label>Texto <textarea name="body" rows="12" maxlength="40000" [disabled]="locked()"
+            <label>Texto <textarea brnTextarea name="body" rows="8" maxlength="40000" [disabled]="locked()"
               [ngModel]="manuscript.body" (ngModelChange)="changeText('body', $event)"></textarea></label>
           </div>
         }
-        <p aria-live="polite" class="hint">{{ saveLabels[saveState()] }}</p>
         @if (error()) { <p class="error" role="alert">{{ error() }}</p> }
-        <div class="toolbar">
+        <div class="toolbar editor-footer">
+          <p aria-live="polite" class="save-indicator" [attr.data-state]="saveState()">{{ saveLabels[saveState()] }}</p>
           @if (saveState() === 'error') {
-            <button type="button" class="secondary" (click)="save()">Reintentar guardado</button>
+            <button brnButton type="button" class="secondary" (click)="save()">Reintentar guardado</button>
           }
           @if (saveState() === 'conflict') {
-            <button type="button" class="secondary" [disabled]="publishing()" (click)="rebase()">
+            <button brnButton type="button" class="secondary" [disabled]="publishing()" (click)="rebase()">
               Guardar mi texto sobre la última versión
             </button>
           }
           @if (current.state === 'PUBLISHED') {
-            <a [routerLink]="['/obras', current.id]">Ver obra publicada</a>
+            <a brnButton class="secondary" [routerLink]="['/obras', current.id]">Ver obra publicada</a>
             <app-withdrawal-dialog [disabled]="locked() || saveState() === 'saving' || saveState() === 'conflict'"
               (confirmed)="changePublication('withdraw')" />
           }
           @if (current.state === 'DRAFT') {
-            <button class="primary" [disabled]="locked() || saveState() === 'saving' || saveState() === 'conflict'"
+            <button brnButton type="button" class="primary" [disabled]="locked() || saveState() === 'saving' || saveState() === 'conflict'"
               (click)="changePublication('publish')">Publicar</button>
           }
         </div>

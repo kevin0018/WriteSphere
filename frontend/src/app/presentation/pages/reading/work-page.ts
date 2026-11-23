@@ -13,20 +13,23 @@ import { SessionState } from '../../../user/application/session';
   imports: [RouterLink, WorkText, BookmarkButton, PublicError, ReportForm],
   template: `
     @if (result().value; as work) {
-      <article class="column reading">
-        <header>
-          <p class="genre">{{ genres[work.genre] }}</p>
-          <h1>{{ work.title }}</h1>
-          <a class="byline" [routerLink]="['/autores', work.authorId]">{{ work.penName }}</a>
-        </header>
-        <app-work-text [body]="work.body" />
-        @if (session.account().penName) {
-          <div class="reading-actions">
-            <app-bookmark-button [id]="work.id" />
-            @for (id of [work.id]; track id) { <app-report-form [id]="id" /> }
-          </div>
-        }
-      </article>
+      <div class="column reading-page">
+        <a class="editor-back" routerLink="/"><span aria-hidden="true">←</span> Portada</a>
+        <article class="reading">
+          <header>
+            <p class="genre">{{ genres[work.genre] }}</p>
+            <h1>{{ work.title }}</h1>
+            <a class="byline" [routerLink]="['/autores', work.authorId]">{{ work.penName }}</a>
+          </header>
+          <app-work-text [body]="work.body" />
+          @if (session.account().penName) {
+            <div class="reading-actions">
+              <app-bookmark-button [id]="work.id" />
+              @for (id of [work.id]; track id) { <app-report-form [id]="id" /> }
+            </div>
+          }
+        </article>
+      </div>
     } @else { <app-public-error [status]="result().status" /> }
   `,
 })

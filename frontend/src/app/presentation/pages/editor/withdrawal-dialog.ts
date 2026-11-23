@@ -1,4 +1,5 @@
 import { Component, input, output } from '@angular/core';
+import { BrnButton } from '@spartan-ng/brain/button';
 import {
   BrnDialog,
   BrnDialogClose,
@@ -11,11 +12,11 @@ import {
 
 @Component({
   selector: 'app-withdrawal-dialog',
-  imports: [BrnDialog, BrnDialogClose, BrnDialogContent, BrnDialogDescription, BrnDialogOverlay,
+  imports: [BrnButton, BrnDialog, BrnDialogClose, BrnDialogContent, BrnDialogDescription, BrnDialogOverlay,
     BrnDialogTitle, BrnDialogTrigger],
   template: `
-    <brn-dialog #dialog="brnDialog" role="alertdialog" [aria-modal]="true" (closed)="closed($event)">
-      <button brnDialogTrigger class="secondary" [disabled]="disabled()">Retirar obra</button>
+    <brn-dialog #dialog="brnDialog" [role]="'alertdialog'" [aria-modal]="true" (closed)="closed($event)">
+      <button brnButton brnDialogTrigger type="button" class="secondary" [disabled]="disabled()">Retirar obra</button>
       <brn-dialog-overlay class="withdrawal-backdrop" />
       <ng-template brnDialogContent>
         <section class="withdrawal-dialog">
@@ -23,8 +24,8 @@ import {
           <p brnDialogDescription>Volverá a tus borradores y dejará de estar disponible en su enlace
             y en las estanterías.</p>
           <div class="toolbar">
-            <button type="button" class="secondary" brnDialogClose>Cancelar</button>
-            <button type="button" class="primary" (click)="dialog.close(true)">Retirar obra</button>
+            <button brnButton type="button" class="secondary" brnDialogClose>Cancelar</button>
+            <button brnButton type="button" class="primary" (click)="dialog.close(true)">Retirar obra</button>
           </div>
         </section>
       </ng-template>

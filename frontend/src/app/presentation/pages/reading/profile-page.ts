@@ -1,15 +1,19 @@
 import { Component, input } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { nextPage, Profile, PublicResult } from '../../../post/application/public-works';
+import { MaritimeCover } from '../../components/layout/maritime-cover';
 import { PublicError } from './public-error';
 import { WorkCard } from './work-card';
 
 @Component({
-  imports: [RouterLink, WorkCard, PublicError],
+  imports: [MaritimeCover, RouterLink, WorkCard, PublicError],
   template: `
     @if (profile().value; as author) {
-      <section class="column">
-        <h1>{{ author.penName }}</h1>
+      <section class="column author-profile">
+        <header class="author-heading">
+          <app-maritime-cover [artworkKey]="author.id" [eager]="true" />
+          <h1>{{ author.penName }}</h1>
+        </header>
         @for (work of author.works.items; track work.id) {
           <app-work-card [work]="work" />
         } @empty { <p class="empty">Este perfil todavía no tiene obras publicadas.</p> }

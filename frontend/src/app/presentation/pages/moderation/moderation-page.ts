@@ -1,6 +1,7 @@
 import { HttpParams } from '@angular/common/http';
 import { Component, inject, signal } from '@angular/core';
 import { RouterLink } from '@angular/router';
+import { BrnButton } from '@spartan-ng/brain/button';
 import { Api, apiMessage } from '../../../shared/infrastructure/api';
 
 type Decision = 'DISMISS' | 'HIDE';
@@ -16,14 +17,18 @@ interface Report {
 }
 
 @Component({
-  imports: [RouterLink],
+  imports: [BrnButton, RouterLink],
   template: `
     <section class="column">
-      <h1>Moderación</h1>
-      <div class="toolbar" aria-label="Estado de los reportes">
-        <button class="secondary" [disabled]="busy()" [attr.aria-pressed]="!resolved()" (click)="load(false)">Pendientes</button>
-        <button class="secondary" [disabled]="busy()" [attr.aria-pressed]="resolved()" (click)="load(true)">Resueltos</button>
-      </div>
+      <header class="atlas-heading">
+        <h1>Moderación</h1>
+        <div class="toolbar" role="group" aria-label="Estado de los reportes">
+          <button brnButton type="button" class="secondary" [disabled]="busy()"
+            [attr.aria-pressed]="!resolved()" (click)="load(false)">Pendientes</button>
+          <button brnButton type="button" class="secondary" [disabled]="busy()"
+            [attr.aria-pressed]="resolved()" (click)="load(true)">Resueltos</button>
+        </div>
+      </header>
       @if (status()) { <p class="hint" role="status">{{ status() }}</p> }
       @if (error()) { <p class="error" role="alert">{{ error() }}</p> }
       @if (reports(); as items) {
@@ -38,8 +43,10 @@ interface Report {
             } @else {
               <div class="toolbar">
                 <a [routerLink]="['/obras', report.workId]">Abrir obra</a>
-                <button class="secondary" [disabled]="busy()" (click)="resolve(report.id, 'DISMISS')">Desestimar</button>
-                <button class="primary" [disabled]="busy()" (click)="resolve(report.id, 'HIDE')">Ocultar obra</button>
+                <button brnButton type="button" class="secondary" [disabled]="busy()"
+                  (click)="resolve(report.id, 'DISMISS')">Desestimar</button>
+                <button brnButton type="button" class="primary" [disabled]="busy()"
+                  (click)="resolve(report.id, 'HIDE')">Ocultar obra</button>
               </div>
             }
           </article>

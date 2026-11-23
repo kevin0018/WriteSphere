@@ -1,40 +1,47 @@
 import { Component, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
+import { BrnButton } from '@spartan-ng/brain/button';
+import { BrnInput } from '@spartan-ng/brain/input';
 import { Api, apiMessage } from '../../../shared/infrastructure/api';
 import { passkeyMessage, Passkeys } from '../../../user/application/passkeys';
 import { SessionState } from '../../../user/application/session';
 
 @Component({
-  imports: [FormsModule, RouterLink],
-  styles: ['.passkey-login { display: block; margin-block: 1rem; }'],
+  imports: [BrnButton, BrnInput, FormsModule, RouterLink],
   template: `
-    <section class="column form-page">
-      <h1>{{ registering ? 'Crear cuenta' : 'Entrar' }}</h1>
+    <section class="column account">
+      <h1>{{ registering ? 'Crear cuenta' : 'Iniciar sesión' }}</h1>
       <form class="form-stack" (ngSubmit)="submit()">
-        <label>Correo <input type="email" name="email" required maxlength="254"
+        <label>Correo <input brnInput type="email" name="email" required maxlength="254"
           autocomplete="email" [(ngModel)]="email"></label>
         @if (registering) {
-          <label>Seudónimo <input name="penName" required minlength="2" maxlength="40"
+          <label>Seudónimo <input brnInput name="penName" required minlength="2" maxlength="40"
             autocomplete="nickname" [(ngModel)]="penName"></label>
         }
-        <label>Contraseña <input type="password" name="password" required maxlength="128"
-          [minlength]="registering ? 12 : 1" [autocomplete]="registering ? 'new-password' : 'current-password'"
-          [(ngModel)]="password"></label>
+        <label>Contraseña
+          <input brnInput type="password" name="password" required maxlength="128"
+            [minlength]="registering ? 12 : 1" [autocomplete]="registering ? 'new-password' : 'current-password'"
+            [attr.aria-describedby]="registering ? 'password-hint' : null" [(ngModel)]="password">
+        </label>
         @if (registering) {
-          <p class="hint">Usa al menos 12 caracteres. Tu correo solo se usa para identificar tu cuenta.</p>
+          <p class="hint" id="password-hint">Usa al menos 12 caracteres. Tu correo solo se usa para identificar tu cuenta.</p>
         }
-        <button class="primary" [disabled]="busy()">{{ registering ? 'Crear cuenta' : 'Entrar' }}</button>
-      </form>
-      @if (!registering && supportsPasskeys) {
-        <button class="secondary passkey-login" type="button" [disabled]="busy()" (click)="signInWithPasskey()">
-          Entrar con passkey
+        @if (error()) { <p class="error" role="alert">{{ error() }}</p> }
+        <button brnButton type="submit" class="primary" [disabled]="busy()">
+          {{ registering ? 'Crear cuenta' : 'Acceder' }}
         </button>
-      }
-      @if (error()) { <p class="error" role="alert">{{ error() }}</p> }
-      <a [routerLink]="registering ? '/entrar' : '/registro'">
-        {{ registering ? 'Ya tengo cuenta' : 'Crear una cuenta' }}
-      </a>
+        @if (!registering && supportsPasskeys) {
+          <button brnButton type="button" class="secondary" [disabled]="busy()" (click)="signInWithPasskey()">
+            Usar una passkey
+          </button>
+        }
+      </form>
+      <div class="account-switch">
+        <a [routerLink]="registering ? '/entrar' : '/registro'">
+          {{ registering ? 'Ya tengo cuenta' : 'Crear una cuenta' }}
+        </a>
+      </div>
     </section>
   `,
 })
